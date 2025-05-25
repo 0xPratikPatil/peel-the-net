@@ -57,9 +57,13 @@ TorLens makes working with the Tor network programmatically easy, clean, and sca
 
 ## 📸 Screenshots
 
-| Home View | Node Detail View |
-|----------------|------------------|
-| ![Home Screenshot]() | ![Node Detail Screenshot]() |
+| Home View | 
+|----------------|
+| ![Home Screenshot](https://github.com/user-attachments/assets/152577a2-22ca-4139-bf92-3791e750ecc0) |
+
+| Node Detail View | 
+|----------------|
+| ![Node Detail](https://github.com/user-attachments/assets/b92e36e1-0a9a-4177-b5e5-c4d7c774e038) |
 
 
 ---
