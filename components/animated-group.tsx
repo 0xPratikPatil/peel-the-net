@@ -1,0 +1,204 @@
+"use client";
+import type { ReactNode, ElementType } from "react";
+import { motion, type Variants } from "framer-motion";
+import React from "react";
+
+export type PresetType =
+  | "fade"
+  | "slide"
+  | "scale"
+  | "blur"
+  | "blur-slide"
+  | "zoom"
+  | "flip"
+  | "bounce"
+  | "rotate"
+  | "swing";
+
+// Polymorphic component types
+type PolymorphicRef<C extends React.ElementType> =
+  React.ComponentPropsWithRef<C>["ref"];
+
+type AsProp<C extends React.ElementType> = {
+  as?: C;
+};
+
+type PropsToOmit<C extends React.ElementType, P> = keyof (AsProp<C> & P);
+
+type PolymorphicComponentProp<
+  C extends React.ElementType,
+  Props = {}
+> = React.PropsWithChildren<Props & AsProp<C>> &
+  Omit<React.ComponentPropsWithoutRef<C>, PropsToOmit<C, Props>>;
+
+type PolymorphicComponent<C extends React.ElementType, Props = {}> = <
+  T extends React.ElementType = C
+>(
+  props: PolymorphicComponentProp<T, Props>
+) => React.ReactElement | null;
+
+export type AnimatedGroupProps = {
+  children: ReactNode;
+  className?: string;
+  variants?: {
+    container?: Variants;
+    item?: Variants;
+  };
+  preset?: PresetType;
+  itemAs?: ElementType;
+};
+
+const defaultContainerVariants: Variants = {
+  visible: {
+    transition: {
+      staggerChildren: 0.1,
+    },
+  },
+};
+
+const defaultItemVariants: Variants = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1 },
+};
+
+const presetVariants: Record<PresetType, Variants> = {
+  fade: {},
+  slide: {
+    hidden: { y: 20 },
+    visible: { y: 0 },
+  },
+  scale: {
+    hidden: { scale: 0.8 },
+    visible: { scale: 1 },
+  },
+  blur: {
+    hidden: { filter: "blur(4px)" },
+    visible: { filter: "blur(0px)" },
+  },
+  "blur-slide": {
+    hidden: { filter: "blur(4px)", y: 20 },
+    visible: { filter: "blur(0px)", y: 0 },
+  },
+  zoom: {
+    hidden: { scale: 0.5 },
+    visible: {
+      scale: 1,
+      transition: { type: "spring", stiffness: 300, damping: 20 },
+    },
+  },
+  flip: {
+    hidden: { rotateX: -90 },
+    visible: {
+      rotateX: 0,
+      transition: { type: "spring", stiffness: 300, damping: 20 },
+    },
+  },
+  bounce: {
+    hidden: { y: -50 },
+    visible: {
+      y: 0,
+      transition: { type: "spring", stiffness: 400, damping: 10 },
+    },
+  },
+  rotate: {
+    hidden: { rotate: -180 },
+    visible: {
+      rotate: 0,
+      transition: { type: "spring", stiffness: 200, damping: 15 },
+    },
+  },
+  swing: {
+    hidden: { rotate: -10 },
+    visible: {
+      rotate: 0,
+      transition: { type: "spring", stiffness: 300, damping: 8 },
+    },
+  },
+};
+
+const addDefaultVariants = (variants: Variants) => ({
+  hidden: { ...defaultItemVariants.hidden, ...variants.hidden },
+  visible: { ...defaultItemVariants.visible, ...variants.visible },
+});
+
+const AnimatedGroup = React.forwardRef<
+  HTMLDivElement,
+  PolymorphicComponentProp<"div", AnimatedGroupProps>
+>(
+  (
+    {
+      as: Component = "div",
+      children,
+      className,
+      variants,
+      preset,
+      itemAs = "div",
+      ...rest
+    },
+    ref
+  ) => {
+    const selectedVariants = {
+      item: addDefaultVariants(preset ? presetVariants[preset] : {}),
+      container: addDefaultVariants(defaultContainerVariants),
+    };
+    const containerVariants = variants?.container || selectedVariants.container;
+    const itemVariants = variants?.item || selectedVariants.item;
+
+    // Safely access motion components with proper type handling
+    // This avoids TypeScript errors when accessing motion components dynamically
+    const getMotionComponent = (element: string): any => {
+      // Only allow valid HTML elements
+      const validElements = [
+        "div",
+        "span",
+        "ul",
+        "ol",
+        "li",
+        "section",
+        "article",
+        "header",
+        "footer",
+        "main",
+        "aside",
+        "nav",
+        "button",
+        "a",
+        "p",
+        "h1",
+        "h2",
+        "h3",
+        "h4",
+        "h5",
+        "h6",
+      ];
+
+      if (validElements.includes(element)) {
+        return motion[element as keyof typeof motion];
+      }
+
+      return motion.div;
+    };
+
+    const MotionComponent = getMotionComponent(Component as string);
+    const MotionItem = getMotionComponent(itemAs as string);
+
+    return (
+      <MotionComponent
+        ref={ref}
+        initial="hidden"
+        animate="visible"
+        variants={containerVariants}
+        className={className}
+        {...rest}
+      >
+        {React.Children.map(children, (child, index) => (
+          <MotionItem key={index} variants={itemVariants}>
+            {child}
+          </MotionItem>
+        ))}
+      </MotionComponent>
+    );
+  }
+) as PolymorphicComponent<"div", AnimatedGroupProps> & { displayName?: string };
+AnimatedGroup.displayName = "AnimatedGroup";
+export { AnimatedGroup };
