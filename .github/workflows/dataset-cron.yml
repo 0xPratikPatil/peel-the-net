@@ -2,7 +2,7 @@ name: Hourly Tor Nodes Dataset Fetch & Commit
 
 on:
   schedule:
-    - cron: '0 * * * *' 
+    - cron: '0 * * * *' # Every hour
   workflow_dispatch:
 
 jobs:
@@ -18,7 +18,7 @@ jobs:
         with:
           python-version: '3.x'
 
-      - name: Install dependencies
+      - name: Install Python dependencies
         run: |
           python -m pip install --upgrade pip
           pip install requests
@@ -27,12 +27,12 @@ jobs:
         run: |
           python cron/dataset.py
 
-      - name: Configure Git for commit
+      - name: Configure Git identity
         run: |
-          git config user.name "GitHub Actions Bot"
-          git config user.email "actions@github.com"
+          git config user.name "${{ secrets.GIT_USERNAME }}"
+          git config user.email "${{ secrets.GIT_EMAIL }}"
 
-      - name: Commit changes
+      - name: Commit & Push updated dataset
         run: |
           git add dataset/
           if git diff --cached --quiet; then
