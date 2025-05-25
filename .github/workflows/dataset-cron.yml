@@ -12,6 +12,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
+        with:
+          persist-credentials: false # Prevent use of default GITHUB_TOKEN
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -33,11 +35,13 @@ jobs:
           git config user.email "${{ secrets.GIT_EMAIL }}"
 
       - name: Commit & Push updated dataset
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
         run: |
           git add dataset/
           if git diff --cached --quiet; then
             echo "No changes to commit."
           else
             git commit -m "chore(dataset): update tor nodes [CI]"
-            git push https://${{ secrets.GH_TOKEN }}@github.com/${{ github.repository }}
+            git push https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}.git HEAD:${{ github.ref }}
           fi
