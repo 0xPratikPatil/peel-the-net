@@ -265,7 +265,7 @@ getNodeInfo('192.168.1.1').then((node) => {
                     </Link>
                   </Button>
                   <Button className="flex-1 rounded-lg " asChild>
-                    <Link href="#" target="_blank">
+                    <Link href="https://www.npmjs.com/package/torlens" target="_blank">
                       <FileText className="mr-2 h-4 w-4" />
                       <span>Documentation</span>
                     </Link>

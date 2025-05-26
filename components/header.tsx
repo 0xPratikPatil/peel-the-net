@@ -25,7 +25,7 @@ export const HeroHeader = () => {
             <div className="hidden md:flex items-center gap-4">
               {isRelayPage && (
                 <Button variant="outline" size="sm" asChild>
-                  <Link href="#">
+                  <Link href="https://github.com/0xpratikpatil/peel-the-net/dataset">
                     <Download className="mr-2 h-4 w-4" />
                     Download Dataset
                   </Link>
