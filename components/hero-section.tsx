@@ -90,7 +90,7 @@ export default function HeroSection() {
                         className="rounded-xl"
                       >
                         <Link
-                          href="https://github.com/0xpratikpatil/peel-the-net/dataset"
+                          href="https://github.com/0xpratikpatil/peel-the-net/tree/main/dataset"
                           target="_blank"
                         >
                           <Database className="mr-2 h-5 w-5" />
